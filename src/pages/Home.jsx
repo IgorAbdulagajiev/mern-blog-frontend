@@ -9,27 +9,29 @@ import { CommentsBlock } from '../components/CommentsBlock';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPosts, fetchTags } from '../redux/slices/posts';
+import { useNavigate } from 'react-router-dom';
 
-export const Home = () => {
+export const Home = ({ postfix, tabActive }) => {
   const dispatch = useDispatch();
   const userData = useSelector(state => state.auth.data);
   const { posts, tags } = useSelector(state => state.posts);
   const isPostsLoading = posts.status === 'loading'
   const isTagsLoading = tags.status === 'loading'
+  const navigate = useNavigate();
   React.useEffect(() => {
-    dispatch(fetchPosts());
+    dispatch(fetchPosts(postfix));
     dispatch(fetchTags());
-  }, []);
+  }, [postfix]);
 
   return (
     <>
       <Tabs
         style={{ marginBottom: 15 }}
-        value={0}
+        value={tabActive}
         aria-label="basic tabs example"
       >
-        <Tab label="Новые" />
-        <Tab label="Популярные" />
+        <Tab onClick={() => navigate("/new")} label="Новые"></Tab>
+        <Tab onClick={() => navigate("/popular")}  label="Популярные" />
       </Tabs>
       <Grid container spacing={4}>
         <Grid xs={8} item>
@@ -40,7 +42,9 @@ export const Home = () => {
               <Post
                 id={obj._id}
                 title={obj.title}
-                imageUrl={obj.imageUrl ? `http://localhost:4444${obj.imageUrl}` : ''}
+                imageUrl={
+                  obj.imageUrl ? `http://localhost:4444${obj.imageUrl}` : ""
+                }
                 user={obj.user}
                 createdAt={obj.createdAt}
                 viewsCount={obj.viewsCount}
