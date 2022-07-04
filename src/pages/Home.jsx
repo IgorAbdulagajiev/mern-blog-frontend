@@ -8,31 +8,46 @@ import { TagsBlock } from '../components/TagsBlock';
 import { CommentsBlock } from '../components/CommentsBlock';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchPosts, fetchTags } from '../redux/slices/posts';
-import { useNavigate } from 'react-router-dom';
+import { fetchPosts, fetchPostsByTags, fetchTags } from '../redux/slices/posts';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Typography } from '@mui/material';
 
-export const Home = ({ postfix, tabActive }) => {
+export const Home = ({ tabActive, type = 'posts' }) => {
   const dispatch = useDispatch();
   const userData = useSelector(state => state.auth.data);
   const { posts, tags } = useSelector(state => state.posts);
   const isPostsLoading = posts.status === 'loading'
   const isTagsLoading = tags.status === 'loading'
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const location = pathname.split("/").at(-1) || 'new';
   React.useEffect(() => {
-    dispatch(fetchPosts(postfix));
+    if (type === 'posts') {
+      dispatch(fetchPosts(location));
+    }
+    if (type === 'tags') {
+      dispatch(fetchPostsByTags(location));
+    }
     dispatch(fetchTags());
-  }, [postfix]);
+  }, [location, type]);
 
   return (
     <>
-      <Tabs
-        style={{ marginBottom: 15 }}
-        value={tabActive}
-        aria-label="basic tabs example"
-      >
-        <Tab onClick={() => navigate("/new")} label="Новые"></Tab>
-        <Tab onClick={() => navigate("/popular")}  label="Популярные" />
-      </Tabs>
+      {type === "posts" && (
+        <Tabs
+          style={{ marginBottom: 15 }}
+          value={tabActive}
+          aria-label="basic tabs example"
+        >
+          <Tab onClick={() => navigate("/new")} label="Новые"></Tab>
+          <Tab onClick={() => navigate("/popular")} label="Популярные" />
+        </Tabs>
+      )}
+      {type === "tags" && (
+        <Typography variant="h4" gutterBottom component="div">
+          {`#${location}`}
+        </Typography>
+      )}
       <Grid container spacing={4}>
         <Grid xs={8} item>
           {(isPostsLoading ? [...Array(5)] : posts.items).map((obj, index) =>

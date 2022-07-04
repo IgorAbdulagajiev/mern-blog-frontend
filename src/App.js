@@ -19,11 +19,15 @@ function App() {
       <Header />
       <Container maxWidth="lg">
         <Routes>
-          <Route path="/" element={<Home postfix="new" tabActive={0} />} />
-          <Route path="/new" element={<Home postfix="new" tabActive={0} />} />
+          <Route path={"/"} element={<Home tabActive={0} />} />
+          <Route path="/new" element={<Home tabActive={0} />} />
           <Route
             path="/popular"
-            element={<Home postfix="popular" tabActive={1} />}
+            element={<Home tabActive={1} />}
+          />
+          <Route
+            path="/tags/:name"
+            element={<Home type="tags" />}
           />
           <Route path="/posts/:id" element={<FullPost />} />
           <Route path="/posts/:id/edit" element={<AddPost />} />
